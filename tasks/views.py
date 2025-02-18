@@ -39,9 +39,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         - Admin users can see all projects.
-        - Regular users can only see projects.
+        - Regular users can only see projects they are assigned to or created by them.
         """
-        return Project.objects.all()
+        user = self.request.user
+        if user.is_admin:
+            return Project.objects.all()
+        else:
+            return Project.objects.filter(assigned_users=user) | Project.objects.filter(created_by=user)
 
     def create(self, request, *args, **kwargs):
         """
@@ -78,7 +82,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return super().partial_update(request, *args, **kwargs)
 
-    
     def destroy(self, request, *args, **kwargs):
         """
         - Only admins can delete projects.
@@ -97,3 +100,22 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        - Admin users can see all tasks.
+        - Regular users can only see tasks assigned to them.
+        """
+        user = self.request.user
+        if user.is_admin:  # Check if the user is an admin
+            return Task.objects.all()  # Admin can see all tasks
+        else:
+            return Task.objects.filter(assigned_to=user)  # Regular users see only their tasks
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Override the destroy method to return a success message instead of a 204 No Content response.
+        """
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Task deleted successfully"}, status=status.HTTP_200_OK)
