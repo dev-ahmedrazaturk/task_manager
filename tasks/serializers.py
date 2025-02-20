@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Task, Project, User
+from .models import Task, Project, User, Comment
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +30,17 @@ class ProjectSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_by"]  # Make sure this field is read-only
 
 class TaskSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Task
         fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source="user.username")  # Show username, not ID
+
+    class Meta:
+        model = Comment
+        fields = ["id", "task", "user", "text", "created_at", "updated_at"]
+        read_only_fields = ["user", "created_at", "updated_at"]  # Prevent modification of user
+    
