@@ -1,14 +1,25 @@
 <div class="projects-container">
-    <button mat-raised-button color="primary" (click)="openProjectModal()">Create Project</button>
+    <div class="header-bar">
+      <button mat-icon-button color="primary" (click)="navigateToDashboard()">
+        <mat-icon>home</mat-icon>
+      </button>
+      <span class="header-title">Projects</span>
+      <button mat-raised-button color="primary" (click)="openProjectModal()">
+        <mat-icon>add</mat-icon> Create Project
+      </button>
+    </div>
   
-    <mat-form-field class="search-bar">
+    <mat-form-field class="search-bar" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
       <input matInput placeholder="Search projects" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
     </mat-form-field>
   
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 animated-table">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let project"> {{ project.name }} </td>
+        <td mat-cell *matCellDef="let project">
+          <mat-icon>folder</mat-icon> {{ project.name }}
+        </td>
       </ng-container>
   
       <ng-container matColumnDef="description">
@@ -18,14 +29,22 @@
   
       <ng-container matColumnDef="assignedUsers">
         <th mat-header-cell *matHeaderCellDef> Assigned Users </th>
-        <td mat-cell *matCellDef="let project"> {{ getAssignedUsernames(project) }} </td>
+        <td mat-cell *matCellDef="let project">
+          <mat-icon>group</mat-icon> {{ getAssignedUsernames(project) }}
+        </td>
       </ng-container>
   
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let project">
-          <button mat-button color="accent" (click)="openProjectModal(project)">Edit</button>
-          <button mat-button color="warn" (click)="deleteProject(project.id)">Delete</button>
+          <ng-container *ngIf="isAdmin">
+            <button mat-icon-button color="accent" (click)="openProjectModal(project)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteProject(project.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ng-container>
         </td>
       </ng-container>
   
@@ -36,32 +55,33 @@
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   
     <ng-template #projectDialog let-dialogRef>
-      <div class="modal-container">
-        <h2>{{ editingProjectId ? 'Edit Project' : 'Create Project' }}</h2>
-        <form [formGroup]="projectForm" (ngSubmit)="createOrUpdateProject()">
-          <mat-form-field appearance="fill">
-            <mat-label>Project Name</mat-label>
-            <input matInput placeholder="Project Name" formControlName="name" />
-          </mat-form-field>
-  
-          <mat-form-field appearance="fill">
-            <mat-label>Project Description</mat-label>
-            <textarea matInput placeholder="Description" formControlName="description"></textarea>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Assigned Users</mat-label>
-            <mat-select placeholder="Assigned Users" formControlName="assigned_users" multiple>
-              <mat-option *ngFor="let user of users" [value]="user.id">{{ user.username }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <div class="actions">
-            <button mat-raised-button color="primary" type="submit">{{ editingProjectId ? 'Update' : 'Create' }}</button>
-            <button mat-button (click)="closeProjectModal()">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </ng-template>
+        <div class="modal-container">
+          <h2>{{ editingProjectId ? 'Edit Project' : 'Create Project' }}</h2>
+          <form [formGroup]="projectForm" (ngSubmit)="createOrUpdateProject()">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Project Name</mat-label>
+              <input matInput placeholder="Project Name" formControlName="name" />
+            </mat-form-field>
+      
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Project Description</mat-label>
+              <textarea matInput placeholder="Description" formControlName="description"></textarea>
+            </mat-form-field>
+      
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Assigned Users</mat-label>
+              <mat-select placeholder="Assigned Users" formControlName="assigned_users" multiple>
+                <mat-option *ngFor="let user of users" [value]="user.id">{{ user.username }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+      
+            <div class="actions">
+              <button mat-raised-button color="primary" type="submit">{{ editingProjectId ? 'Update' : 'Create' }}</button>
+              <button mat-button (click)="closeProjectModal()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      
   </div>
   

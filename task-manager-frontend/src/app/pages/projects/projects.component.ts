@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-
+import { MatIconModule } from '@angular/material/icon';
 
 
 @Component({
@@ -24,6 +24,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css'],
   imports: [
+    MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
@@ -46,6 +47,7 @@ export class ProjectsComponent implements OnInit {
   dataSource = new MatTableDataSource<any>([]);
   searchTerm: string = '';
   displayedColumns: string[] = ['name', 'description', 'assignedUsers', 'actions'];
+  isAdmin: boolean = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('projectDialog') projectDialog!: TemplateRef<any>;
@@ -66,6 +68,9 @@ export class ProjectsComponent implements OnInit {
       description: ['', Validators.required],
       assigned_users: [[]],
     });
+
+    this.isAdmin = this.authService.getCurrentUser()?.is_admin || false;
+
   }
 
   ngOnInit(): void {
@@ -137,4 +142,9 @@ export class ProjectsComponent implements OnInit {
   deleteProject(projectId: number): void {
     this.projectService.deleteProject(projectId).subscribe(() => this.fetchProjects());
   }
+
+  navigateToDashboard(): void {
+    window.location.href = '/dashboard';
+  }
+  
 }
