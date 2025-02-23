@@ -16,6 +16,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -46,7 +47,7 @@ export class ProjectsComponent implements OnInit {
   editingProjectId: number | null = null;
   dataSource = new MatTableDataSource<any>([]);
   searchTerm: string = '';
-  displayedColumns: string[] = ['projectInfo', 'assignedUsers', 'actions'];
+  displayedColumns: string[] = ['projectInfo', 'assignedUsers', 'actions', 'navigateToTasks'];
   isAdmin: boolean = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -61,7 +62,8 @@ export class ProjectsComponent implements OnInit {
     private projectService: ProjectService,
     private authService: AuthService,
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router 
   ) {
     this.projectForm = this.fb.group({
       name: ['', Validators.required],
@@ -145,6 +147,10 @@ export class ProjectsComponent implements OnInit {
 
   navigateToDashboard(): void {
     window.location.href = '/dashboard';
+  }
+
+  navigateToProjectTasks(projectId: number): void {
+    this.router.navigate(['/tasks', projectId]);
   }
   
 }
