@@ -45,6 +45,11 @@ export class AuthService {
     localStorage.setItem('access_token', token);
     this.currentUserSubject.next(this.getCurrentUser());
   }
+  
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user ? user.is_admin : false;
+  }
 
   getProfile(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}profile/`, {

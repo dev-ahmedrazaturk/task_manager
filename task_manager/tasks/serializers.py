@@ -16,6 +16,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims (user details) to the token
         token['username'] = user.username
         token['email'] = user.email
+        token['is_admin'] = user.is_admin
 
         return token
 
@@ -37,9 +38,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class ProjectSerializer(serializers.ModelSerializer):
+    assigned_users = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Project
-        fields = "__all__"
+        fields = '__all__'
         read_only_fields = ["created_by"]  # Make sure this field is read-only
 
 class TaskSerializer(serializers.ModelSerializer):

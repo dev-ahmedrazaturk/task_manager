@@ -9,6 +9,18 @@ from .serializers import CommentSerializer, CustomTokenObtainPairSerializer, Tas
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+class UserViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """
+        Get a list of all users.
+        """
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
@@ -62,8 +74,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_admin:
             return Project.objects.all()
-        else:
-            return Project.objects.filter(assigned_users=user) | Project.objects.filter(created_by=user)
+        return Project.objects.filter(assigned_users=user) | Project.objects.filter(created_by=user)
 
     def create(self, request, *args, **kwargs):
         """
@@ -71,46 +82,65 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         if not request.user.is_admin:
             return Response({"error": "Only admins can create projects."}, status=status.HTTP_403_FORBIDDEN)
-        
-        return super().create(request, *args, **kwargs)
+
+        data = request.data
+        assigned_user_ids = data.get('assigned_users', [])
+        project = Project.objects.create(
+            name=data.get('name'),
+            description=data.get('description'),
+            created_by=request.user
+        )
+        project.assigned_users.set(assigned_user_ids)  # Assign users to project
+        project.save()
+
+        serializer = self.get_serializer(project)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
         """
-        - Assign the authenticated user to `created_by`
+        - Assign the authenticated user to `created_by` and handle assigned users.
         """
         serializer.save(created_by=self.request.user)
 
     def update(self, request, *args, **kwargs):
         """
         - Only admins can update projects.
-        - Regular users cannot update any project.
         """
         if not request.user.is_admin:
             return Response({"error": "Only admins can update projects."}, status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object()
+        data = request.data
+        assigned_user_ids = data.get('assigned_users', [])
+        instance.assigned_users.set(assigned_user_ids)
+        instance.save()
 
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
         """
         - Only admins can update projects.
-        - Regular users cannot update any project.
         """
         if not request.user.is_admin:
             return Response({"error": "Only admins can update projects."}, status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object()
+        data = request.data
+        assigned_user_ids = data.get('assigned_users', [])
+        instance.assigned_users.set(assigned_user_ids)
+        instance.save()
 
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """
         - Only admins can delete projects.
-        - Regular users cannot delete any project.
         """
         if not request.user.is_admin:
             return Response({"error": "Only admins can delete projects."}, status=status.HTTP_403_FORBIDDEN)
 
         instance = self.get_object()
-        instance.delete()  # Ensure the object is deleted manually
-
+        instance.delete()
         return Response({"message": "Project deleted successfully."}, status=status.HTTP_200_OK)
 
 class TaskViewSet(viewsets.ModelViewSet):

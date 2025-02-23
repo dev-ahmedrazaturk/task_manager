@@ -19,6 +19,10 @@ export class DashboardComponent {
     debugger;
   }
 
+  projects(): void {
+    this.router.navigate(['/projects']);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
