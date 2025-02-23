@@ -5,15 +5,18 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Task, Project, User, Comment
-from .serializers import CommentSerializer, TaskSerializer, ProjectSerializer, RegisterSerializer, UserSerializer
+from .serializers import CommentSerializer, CustomTokenObtainPairSerializer, TaskSerializer, ProjectSerializer, RegisterSerializer, UserSerializer
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
     
-
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    
 class UserProfileView(APIView):
     authentication_classes = [JWTAuthentication]  # Ensure JWT Authentication is used
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated

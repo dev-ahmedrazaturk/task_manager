@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-     'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'tasks',
     'corsheaders',
@@ -58,7 +58,30 @@ MIDDLEWARE = [
 
 
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:4200",  # ✅ Correct format
+#     "http://127.0.0.1:4200"   # ✅ Ensure your frontend URL is listed
+# ]
+
+
+CORS_ALLOW_ALL_ORIGINS = True  # ✅ Allows all origins (Use for development only)
+
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
+]
+
+# Allow specific headers
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-requested-with"
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

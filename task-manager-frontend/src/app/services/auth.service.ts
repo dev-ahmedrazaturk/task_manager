@@ -11,7 +11,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth/`;  // Add your backend API URL
+  private apiUrl = `${environment.apiUrl}`;  // Add your backend API URL
   private currentUserSubject: BehaviorSubject<User>;
 
   constructor(private http: HttpClient, private router: Router, private jwtHelper: JwtHelperService) {
