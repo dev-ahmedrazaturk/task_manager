@@ -15,42 +15,42 @@
     </mat-form-field>
   
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 animated-table">
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let project">
-          <mat-icon>folder</mat-icon> {{ project.name }}
-        </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef> Description </th>
-        <td mat-cell *matCellDef="let project"> {{ project.description }} </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="assignedUsers">
-        <th mat-header-cell *matHeaderCellDef> Assigned Users </th>
-        <td mat-cell *matCellDef="let project">
-          <mat-icon>group</mat-icon> {{ getAssignedUsernames(project) }}
-        </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let project">
-          <ng-container *ngIf="isAdmin">
+        <ng-container matColumnDef="projectInfo">
+          <th mat-header-cell *matHeaderCellDef> Project </th>
+          <td mat-cell *matCellDef="let project">
+            <div class="project-info-container">
+              <div class="project-name">
+                <mat-icon>folder</mat-icon> {{ project.name }}
+              </div>
+              <div class="project-description">
+                <mat-icon>description</mat-icon> {{ project.description }}
+              </div>
+            </div>
+          </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="assignedUsers">
+          <th mat-header-cell *matHeaderCellDef> Assigned Users </th>
+          <td mat-cell *matCellDef="let project">
+            <mat-icon>group</mat-icon> {{ getAssignedUsernames(project) }}
+          </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let project">
             <button mat-icon-button color="accent" (click)="openProjectModal(project)">
               <mat-icon>edit</mat-icon>
             </button>
             <button mat-icon-button color="warn" (click)="deleteProject(project.id)">
               <mat-icon>delete</mat-icon>
             </button>
-          </ng-container>
-        </td>
-      </ng-container>
-  
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+          </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
   
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   

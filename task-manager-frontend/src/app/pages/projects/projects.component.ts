@@ -46,7 +46,7 @@ export class ProjectsComponent implements OnInit {
   editingProjectId: number | null = null;
   dataSource = new MatTableDataSource<any>([]);
   searchTerm: string = '';
-  displayedColumns: string[] = ['name', 'description', 'assignedUsers', 'actions'];
+  displayedColumns: string[] = ['projectInfo', 'assignedUsers', 'actions'];
   isAdmin: boolean = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
