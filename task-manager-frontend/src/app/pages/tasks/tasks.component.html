@@ -1,0 +1,131 @@
+<div class="tasks-container">
+    <div class="header-actions">
+        <!-- Left-Side: Home & Projects Together -->
+        <div class="left-actions">
+          <button mat-icon-button class="home-btn" (click)="navigateToDashboard()" matTooltip="Go to Dashboard">
+            <mat-icon>home</mat-icon>
+          </button>
+      
+          <button mat-icon-button class="home-btn" (click)="navigateToProjects()" matTooltip="Go to Projects">
+            <mat-icon>folder</mat-icon>
+          </button>
+        </div>
+      
+        <!-- Centered Page Title -->
+        <h2 class="page-title">Tasks for ({{ projectName || 'Project' }})</h2>
+      
+        <!-- Right-Side: Create Task Button -->
+        <div class="right-actions">
+          <button mat-raised-button color="primary" (click)="openTaskModal()">
+            <mat-icon>add</mat-icon> Create Task
+          </button>
+        </div>
+      </div>
+      
+  
+    <!-- Search Bar -->
+    <mat-form-field class="search-bar" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Search tasks" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
+    </mat-form-field>
+  
+    <!-- Task List -->
+    <div class="task-list">
+      <div class="task-card" *ngFor="let task of dataSource.filteredData">
+        <div class="task-header">
+          <mat-icon>checklist</mat-icon>
+          <span class="task-title">{{ task.title }}</span>
+        </div>
+        <div class="task-body">
+          <div class="task-detail">
+            <mat-icon>description</mat-icon>
+            <span>{{ task.description }}</span>
+          </div>
+          <div class="task-detail">
+            <mat-icon>event</mat-icon>
+            <span>{{ task.due_date }}</span>
+          </div>
+          <div class="task-detail">
+            <mat-icon>priority_high</mat-icon>
+            <span>{{ task.priority }}</span>
+          </div>
+          <div class="task-detail">
+            <mat-icon>flag</mat-icon>
+            <span>{{ task.status }}</span>
+          </div>
+          <div class="task-detail">
+            <mat-icon>group</mat-icon>
+            <span>{{ getAssignedUsernames(task) }}</span>
+          </div>
+          <div class="task-detail">
+            <mat-icon>folder</mat-icon>
+            <span>{{ task.project.name || 'N/A' }}</span>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button mat-icon-button color="accent" (click)="openTaskModal(task)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pagination -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  
+    <!-- Task Modal -->
+    <ng-template #taskDialog let-dialogRef>
+        <div class="modal-container">
+          <h2 class="dialog-title">{{ editingTaskId ? 'Edit Task' : 'Create Task' }}</h2>
+          <form [formGroup]="taskForm" (ngSubmit)="createOrUpdateTask()">
+            
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Task Name*</mat-label>
+                <input matInput formControlName="title" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Due Date*</mat-label>
+                <input matInput formControlName="due_date" type="date" />
+              </mat-form-field>
+            </div>
+      
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Priority*</mat-label>
+                <mat-select formControlName="priority">
+                  <mat-option value="low">Low</mat-option>
+                  <mat-option value="medium">Medium</mat-option>
+                  <mat-option value="high">High</mat-option>
+                </mat-select>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Assigned Users</mat-label>
+                <mat-select formControlName="assigned_to" multiple>
+                  <mat-option *ngFor="let user of users" [value]="user.id">{{ user.username }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+      
+            <!-- Full Width Task Description -->
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Task Description*</mat-label>
+              <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+      
+            <div class="actions">
+              <button mat-raised-button color="primary" type="submit">{{ editingTaskId ? 'Update' : 'Create' }}</button>
+              <button mat-button (click)="closeTaskModal()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      
+      
+  </div>
+  

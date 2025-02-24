@@ -8,6 +8,8 @@ from .models import Task, Project, User, Comment
 from .serializers import CommentSerializer, CustomTokenObtainPairSerializer, TaskSerializer, ProjectSerializer, RegisterSerializer, UserSerializer
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.decorators import action
+
 
 class UserViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
@@ -160,19 +162,46 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        - Assign multiple users to a task.
+        - Ensure project ID is included.
+        - Assign multiple users to the task.
         """
-        serializer.save()
+        project_id = self.request.data.get("project")  # Get project ID from request
+        assigned_users = self.request.data.get("assigned_to", [])  # Get assigned users list
+
+        if not project_id:
+            return Response({"error": "Project ID is required to create a task."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save task with project
+        task = serializer.save(project_id=project_id)  # Assign project ID explicitly
+
+        # Assign ManyToMany Users
+        if assigned_users:
+            task.assigned_to.set(assigned_users)  # Use `.set()` to update ManyToMany field
 
     def update(self, request, *args, **kwargs):
         """
         - Ensure only admins or project managers can update tasks.
+        - Manually handle updating the ManyToMany field (assigned users).
         """
         instance = self.get_object()
+
+        # Check permissions
         if not request.user.is_admin and request.user not in instance.project.assigned_users.all():
             return Response({"error": "Only admins or project managers can update tasks."}, status=status.HTTP_403_FORBIDDEN)
-        
-        return super().update(request, *args, **kwargs)
+
+        # Deserialize incoming data
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Save the task instance (excluding assigned users initially)
+        updated_task = serializer.save()
+
+        # Handle ManyToMany assigned users separately
+        if "assigned_to" in request.data:
+            assigned_users = request.data.get("assigned_to", [])  # Get assigned users from request
+            updated_task.assigned_to.set(assigned_users)  # Update ManyToMany field
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -184,6 +213,30 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         self.perform_destroy(instance)
         return Response({"message": "Task deleted successfully."}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='by-project')
+    def get_tasks_by_project(self, request):
+        """
+        Get tasks by project ID.
+        - Admins: Can view all tasks in the project.
+        - Regular users: Can only view tasks assigned to them in the project.
+        """
+        project_id = request.query_params.get('project_id')
+        if not project_id:
+            return Response({"error": "Project ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user  # Get current user
+
+        # Filter tasks based on user role
+        if user.is_admin:
+            tasks = Task.objects.filter(project_id=project_id)
+        else:
+            tasks = Task.objects.filter(project_id=project_id, assigned_to=user)
+
+        tasks = tasks.select_related('project').prefetch_related('assigned_to')  # Optimize query
+
+        serializer = self.get_serializer(tasks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer

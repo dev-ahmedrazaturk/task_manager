@@ -8,12 +8,16 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = `${environment.apiUrl}/tasks/`;
+  private apiUrl = `${environment.apiUrl}tasks/`;
 
   constructor(private http: HttpClient) {}
 
   getAllTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl);
+  }
+
+  getTasksByProject(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}by-project/?project_id=${projectId}`);
   }
 
   createTask(taskData: any): Observable<Task> {

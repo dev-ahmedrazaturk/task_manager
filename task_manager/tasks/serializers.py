@@ -46,10 +46,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_by"]  # Make sure this field is read-only
 
 class TaskSerializer(serializers.ModelSerializer):
+    assigned_to = UserSerializer(many=True, read_only=True)
+    project = ProjectSerializer(read_only=True)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'due_date', 'priority', 'status', 'project', 'assigned_to']
 
 
 class CommentSerializer(serializers.ModelSerializer):
