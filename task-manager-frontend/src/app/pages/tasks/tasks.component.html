@@ -31,7 +31,7 @@
   
     <!-- Task List -->
     <div class="task-list">
-      <div class="task-card" *ngFor="let task of dataSource.filteredData">
+      <div class="task-card" *ngFor="let task of dataSource.filteredData" (click)="openTaskDetailDialog(task)">
         <div class="task-header">
           <mat-icon>checklist</mat-icon>
           <span class="task-title">{{ task.title }}</span>
@@ -124,8 +124,7 @@
             </div>
           </form>
         </div>
-      </ng-template>
-      
-      
+    </ng-template>
+        
   </div>
   

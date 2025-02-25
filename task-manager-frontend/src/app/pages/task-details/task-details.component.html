@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>Task Details</h2>
+<mat-dialog-content>
+    <!-- Task Details Section -->
+    <div class="task-details">
+        <h3>{{ task.title }}</h3>
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Due Date:</strong> {{ task.due_date | date }}</p>
+        <p><strong>Priority:</strong> {{ task.priority }}</p>
+        <p><strong>Status:</strong> {{ task.status }}</p>
+        <p><strong>Assigned To:</strong> {{ getAssignedUsernames(task) }}</p>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h4>Comments</h4>
+
+        <!-- Display Existing Comments -->
+        <div class="comment-list" #commentsContainer>
+            <div class="comment" *ngFor="let comment of comments">
+                <div class="comment-header">
+                    <span class="comment-author">{{ comment.user.username }}</span>
+                    <span class="comment-date">{{ comment.created_at | date }}</span>
+                </div>
+                <div class="comment-body">
+                    <p>{{ comment.text }}</p>
+                </div>
+                <div class="comment-actions">
+                    <button mat-icon-button color="accent" *ngIf="comment.user.id === currentUser.id" (click)="editComment(comment)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" *ngIf="comment.user.id === currentUser.id" (click)="deleteComment(comment.id)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Comment Form -->
+        <form [formGroup]="commentForm" (ngSubmit)="addComment()">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Add a comment</mat-label>
+                <textarea matInput formControlName="text" rows="3"></textarea>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit">Add Comment</button>
+        </form>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,138 @@
+/* Task Details Section */
+.task-details {
+    margin-bottom: 20px;
+}
+
+.task-details h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.task-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #444;
+}
+
+/* Comments Section */
+.comments-section {
+    margin-top: 15px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    max-height: 60vh;
+    overflow-y: auto; /* Ensure the comments section can scroll */
+}
+
+/* Comments List */
+.comment-list {
+    margin-bottom: 15px;
+}
+
+/* Individual Comment Styling */
+.comment {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+/* Comment Header (Username and Date) */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+/* Comment Body */
+.comment-body {
+    font-size: 0.9em;
+}
+
+/* Comment Actions (Edit/Delete) */
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.comment-actions button {
+    background-color: transparent;
+    border: none;
+    color: #888;
+}
+
+.comment-actions button:hover {
+    color: #333;
+}
+
+/* Add New Comment Form */
+.full-width {
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+button.mat-raised-button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background-color: #1976d2;
+    color: #fff;
+    border-radius: 6px;
+}
+
+/* Actions (Close Button) */
+mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.actions button {
+    background-color: #e0e0e0;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.actions button:hover {
+    background-color: #ccc;
+}
+
+/* Make the whole dialog scrollable and with a max-height */
+.mat-dialog-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Override Angular Material Dialog Width */
+.mat-dialog-container {
+    width: 1000px !important;  /* Increase the width to 1000px */
+    max-width: 100% !important; /* Prevent it from exceeding screen size */
+}
+
+.mat-dialog-content {
+    display: block;
+    width: 100%;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .task-details p {
+        font-size: 0.9rem;
+    }
+
+    .comments-section {
+        max-height: 50vh;
+    }
+}

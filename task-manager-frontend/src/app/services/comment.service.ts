@@ -8,11 +8,11 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class CommentService {
-  private apiUrl = `${environment.apiUrl}/comments/`;
+  private apiUrl = `${environment.apiUrl}comments/`;
 
   constructor(private http: HttpClient) {}
 
-  getComments(taskId: number): Observable<Comment[]> {
+  getCommentsByTask(taskId: number): Observable<Comment[]> {
     return this.http.get<Comment[]>(`${this.apiUrl}?task=${taskId}`);
   }
 

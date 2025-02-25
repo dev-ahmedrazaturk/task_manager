@@ -18,12 +18,16 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
 import { ProjectService } from '../../services/project.service';
+import { CommentService } from '../../services/comment.service';
+import { MatCardModule } from '@angular/material/card';
+import { TaskDetailsComponent } from '../task-details/task-details.component';
 
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css'],
   imports: [
+    MatCardModule,
     MatTableModule,
     MatPaginatorModule,
     MatFormFieldModule,
@@ -47,9 +51,11 @@ export class TasksComponent implements OnInit {
   displayedColumns: string[] = ['title', 'description', 'dueDate', 'priority', 'status', 'assignedUsers', 'project', 'actions'];
   searchTerm: string = '';
   projectName: string = '';
+  selectedTask: Task = {} as Task;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('taskDialog') taskDialog!: TemplateRef<any>;
+  @ViewChild('taskDetailDialog') taskDetailDialog!: TemplateRef<any>;
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +63,8 @@ export class TasksComponent implements OnInit {
     private userService: UserService,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private commentService: CommentService,
   ) {
     this.taskForm = this.fb.group({
       title: ['', Validators.required],
@@ -166,4 +173,11 @@ export class TasksComponent implements OnInit {
   navigateToDashboard(): void {
     window.location.href = '/dashboard';
   }
+
+  openTaskDetailDialog(task: Task): void {
+    this.dialog.open(TaskDetailsComponent, {
+        width: '1000px',
+        data: { task }
+    });
+}
 }

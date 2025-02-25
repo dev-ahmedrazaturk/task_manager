@@ -55,10 +55,10 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source="user.username")  # Show username, not ID
+    user = UserSerializer(read_only=True)
+    task_id = serializers.PrimaryKeyRelatedField(queryset=Task.objects.all(), write_only=True)
 
     class Meta:
         model = Comment
-        fields = ["id", "task", "user", "text", "created_at", "updated_at"]
-        read_only_fields = ["user", "created_at", "updated_at"]  # Prevent modification of user
+        fields = ['id', 'text', 'user', 'task_id', 'created_at', 'updated_at']
     

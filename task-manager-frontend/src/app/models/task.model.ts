@@ -1,5 +1,6 @@
 import { Project } from "./project.model";
 import { User } from "./user.model";
+import { Comment } from "./comment.model";
 
 export interface Task {
   id: number;
@@ -10,5 +11,5 @@ export interface Task {
   status: 'pending' | 'in_progress' | 'completed';
   project: Project;
   assigned_to: User[];
-  comments?: Comment[];
+  comments: Comment[] | null;
 }

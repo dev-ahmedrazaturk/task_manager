@@ -242,45 +242,41 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
+    
     def get_queryset(self):
         """
-        - Admins can view all comments.
-        - Regular users can only view comments on tasks assigned to them.
+        - Admins and regular users can view all comments for a task.
         - If a `task` query param is provided, filter comments for that task.
         """
         user = self.request.user
         queryset = Comment.objects.select_related('task', 'user')
 
-        # Admin can see all comments, Regular users see only their tasks' comments
-        if not user.is_admin:
-            queryset = queryset.filter(user=user)
-
-        # ✅ Correctly filter by task if `task` query param is provided
+        # If a `task` query param is provided, filter comments for that task
         task_id = self.request.query_params.get("task")
         if task_id:
-            queryset = queryset.filter(task_id=task_id)
+            queryset = queryset.filter(task_id=task_id)  # Filter by task_id to get comments for specific task
 
         return queryset
+
 
     def perform_create(self, serializer):
         """
         - Assigns the logged-in user to the comment.
         - Ensures only task assignees or admins can comment.
         """
-        task_id = self.request.data.get("task")
+        task_id = self.request.data.get("task_id")  # Make sure to pass 'task_id' instead of 'task'
 
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
             return Response({"error": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Correctly check Many-to-Many relationship (task.assigned_to is ManyToManyField)
+        # Correctly check Many-to-Many relationship (task.assigned_to is ManyToManyField)
         if not (self.request.user.is_admin or task.assigned_to.filter(id=self.request.user.id).exists()):
             return Response({"error": "Only the task assignee or an admin can comment."}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer.save(user=self.request.user, task=task)
-
+        # Pass task.id instead of the entire task object
+        serializer.save(user=self.request.user, task_id=task.id)  # task_id is expected, not task object
     def update(self, request, *args, **kwargs):
         """
         - Only the comment owner or admin can update a comment.
