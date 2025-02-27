@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Comment } from '../models/comment.model';
 import { environment } from '../../environments/environment';
 
@@ -14,6 +14,10 @@ export class CommentService {
 
   getCommentsByTask(taskId: number): Observable<Comment[]> {
     return this.http.get<Comment[]>(`${this.apiUrl}?task=${taskId}`);
+  }
+
+  getCommentCount(taskId: number): Observable<any> {
+    return this.http.get<number>(`${this.apiUrl}count/?task_id=${taskId}`);
   }
 
   createComment(commentData: any): Observable<Comment> {

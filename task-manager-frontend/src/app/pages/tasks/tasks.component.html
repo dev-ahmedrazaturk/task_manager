@@ -1,6 +1,5 @@
 <div class="tasks-container">
     <div class="header-actions">
-        <!-- Left-Side: Home & Projects Together -->
         <div class="left-actions">
           <button mat-icon-button class="home-btn" (click)="navigateToDashboard()" matTooltip="Go to Dashboard">
             <mat-icon>home</mat-icon>
@@ -11,19 +10,13 @@
           </button>
         </div>
       
-        <!-- Centered Page Title -->
         <h2 class="page-title">Tasks for ({{ projectName || 'Project' }})</h2>
-      
-        <!-- Right-Side: Create Task Button -->
-        <div class="right-actions">
-          <button mat-raised-button color="primary" (click)="openTaskModal()">
-            <mat-icon>add</mat-icon> Create Task
-          </button>
-        </div>
-      </div>
-      
+
+        <button *ngIf="isAdmin" mat-raised-button color="primary" class="create-task-btn" (click)="openTaskModal()">
+          <mat-icon>add</mat-icon> Create Task
+        </button>
+    </div>
   
-    <!-- Search Bar -->
     <mat-form-field class="search-bar" appearance="outline">
       <mat-icon matPrefix>search</mat-icon>
       <input matInput placeholder="Search tasks" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
@@ -31,14 +24,13 @@
   
     <!-- Task List -->
     <div class="task-list">
-      <div class="task-card" *ngFor="let task of dataSource.filteredData" (click)="openTaskDetailDialog(task)">
+      <div class="task-card" *ngFor="let task of dataSource.filteredData">
         <div class="task-header">
           <mat-icon>checklist</mat-icon>
           <span class="task-title">{{ task.title }}</span>
         </div>
         <div class="task-body">
           <div class="task-detail">
-            <mat-icon>description</mat-icon>
             <span>{{ task.description }}</span>
           </div>
           <div class="task-detail">
@@ -63,17 +55,22 @@
           </div>
         </div>
         <div class="task-actions">
-          <button mat-icon-button color="accent" (click)="openTaskModal(task)">
+          <button mat-icon-button color="primary" (click)="openTaskDetailDialog(task)" 
+          class="comment-btn">
+            <mat-icon>comment</mat-icon>
+            <span class="comment-badge" *ngIf="task.count > 0">{{ task.count }}</span>
+          </button>
+          
+          <button *ngIf="isAdmin" mat-icon-button color="accent" (click)="openTaskModal(task)">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
+          <button *ngIf="isAdmin" mat-icon-button color="warn" (click)="deleteTask(task.id)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
     </div>
   
-    <!-- Pagination -->
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   
     <!-- Task Modal -->
@@ -103,7 +100,17 @@
                   <mat-option value="high">High</mat-option>
                 </mat-select>
               </mat-form-field>
-      
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Status*</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="ToDo">ToDo</mat-option>
+                  <mat-option value="InProgress">InProgress</mat-option>
+                  <mat-option value="Completed">Completed</mat-option>
+                  <mat-option value="Archive">Archive</mat-option>
+                </mat-select>
+              </mat-form-field>
+
               <mat-form-field appearance="outline">
                 <mat-label>Assigned Users</mat-label>
                 <mat-select formControlName="assigned_to" multiple>
@@ -112,7 +119,6 @@
               </mat-form-field>
             </div>
       
-            <!-- Full Width Task Description -->
             <mat-form-field class="full-width" appearance="outline">
               <mat-label>Task Description*</mat-label>
               <textarea matInput formControlName="description" rows="3"></textarea>

@@ -3,13 +3,15 @@
       <button mat-icon-button color="primary" (click)="navigateToDashboard()">
         <mat-icon>home</mat-icon>
       </button>
-      <span class="header-title">Projects</span>
-      <button mat-raised-button color="primary" (click)="openProjectModal()">
+      <span class="header-title">
+        Projects
+      </span>
+      <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="openProjectModal()">
         <mat-icon>add</mat-icon> Create Project
       </button>
     </div>
   
-    <mat-form-field class="search-bar" appearance="outline">
+    <mat-form-field class="search-bar full-width" appearance="outline">
       <mat-icon matPrefix>search</mat-icon>
       <input matInput placeholder="Search projects" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
     </mat-form-field>
@@ -37,16 +39,16 @@
       </ng-container>
     
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let project">
-          <button mat-icon-button color="accent" (click)="openProjectModal(project)">
+        <th mat-header-cell *matHeaderCellDef> <span *ngIf="isAdmin"> Actions</span> </th>
+        <td mat-cell  *matCellDef="let project">
+          <button *ngIf="isAdmin" mat-icon-button color="accent" (click)="openProjectModal(project)">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteProject(project.id)">
+          <button *ngIf="isAdmin" mat-icon-button color="warn" (click)="deleteProject(project.id)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
-      </ng-container>
+      </ng-container>      
 
       <ng-container matColumnDef="navigateToTasks">
         <th mat-header-cell *matHeaderCellDef> Go to Tasks </th>
@@ -58,7 +60,7 @@
       </ng-container>
     
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="navigateToProjectTasks(row.id)"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>

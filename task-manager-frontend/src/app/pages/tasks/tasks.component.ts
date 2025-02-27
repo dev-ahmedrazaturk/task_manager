@@ -21,12 +21,16 @@ import { ProjectService } from '../../services/project.service';
 import { CommentService } from '../../services/comment.service';
 import { MatCardModule } from '@angular/material/card';
 import { TaskDetailsComponent } from '../task-details/task-details.component';
+import { AuthService } from '../../services/auth.service';
+import { forkJoin, map, Observable } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css'],
   imports: [
+    MatSnackBarModule,
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
@@ -52,6 +56,8 @@ export class TasksComponent implements OnInit {
   searchTerm: string = '';
   projectName: string = '';
   selectedTask: Task = {} as Task;
+  isAdmin: boolean = false;
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('taskDialog') taskDialog!: TemplateRef<any>;
@@ -65,15 +71,19 @@ export class TasksComponent implements OnInit {
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private commentService: CommentService,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {
     this.taskForm = this.fb.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
       due_date: ['', Validators.required],
       priority: ['medium', Validators.required],
-      status: ['pending'],
+      status: ['ToDo', Validators.required],
       assigned_to: [[]],
     });
+    this.isAdmin = this.authService.getCurrentUser()?.is_admin || false;
+
   }
 
   ngOnInit(): void {
@@ -86,15 +96,27 @@ export class TasksComponent implements OnInit {
   fetchTasksByProject(): void {
     if (this.projectId) {
       this.taskService.getTasksByProject(this.projectId).subscribe((tasks: Task[]) => {
-        this.tasks = tasks.map(task => ({
-          ...task,
-          project_name: task.project?.name || 'N/A'
-        }));
-        this.dataSource.data = tasks;
-        this.dataSource.paginator = this.paginator;
+        // Use a forkJoin to wait for all comment count API calls
+        const taskRequests = tasks.map(task =>
+          this.commentService.getCommentCount(task.id).pipe(
+            map(count => ({ ...task, count: count.comment_count })) // Attach count to each task
+          )
+        );
+  
+        // Wait for all API calls before updating the tasks list
+        forkJoin(taskRequests).subscribe(updatedTasks => {
+          this.tasks = updatedTasks.map(task => ({
+            ...task,
+            project_name: task.project?.name || 'N/A'
+          }));
+  
+          this.dataSource.data = this.tasks;
+          this.dataSource.paginator = this.paginator;
+        });
       });
     }
   }
+  
 
   fetchProjectName(): void {
     this.projectService.getProjectById(this.projectId).subscribe(project => {
@@ -138,14 +160,16 @@ export class TasksComponent implements OnInit {
     };
 
     if (this.editingTaskId) {
-      this.taskService.updateTask(this.editingTaskId, taskData).subscribe(() => {
+      this.taskService.updateTask(this.editingTaskId, taskData).subscribe((response: any) => {
         this.fetchTasksByProject();
         this.closeTaskModal();
+        this.showNotification(`Task "${response.title}" updated successfully!`);
       });
     } else {
-      this.taskService.createTask(taskData).subscribe(() => {
+      this.taskService.createTask(taskData).subscribe((response: any) => {
         this.fetchTasksByProject();
         this.closeTaskModal();
+        this.showNotification(`Task "${response.title}" updated successfully!`);
       });
     }
   }
@@ -163,7 +187,20 @@ export class TasksComponent implements OnInit {
   }
 
   deleteTask(taskId: number): void {
-    this.taskService.deleteTask(taskId).subscribe(() => this.fetchTasksByProject());
+    this.taskService.deleteTask(taskId).subscribe(
+      (response: any) => {
+        this.tasks = this.tasks.filter(task => task.id !== taskId);
+        this.dataSource.data = this.tasks;
+        this.dataSource.paginator = this.paginator;
+
+        this.showNotification(response.message || "Task deleted successfully!");
+
+        setTimeout(() => this.fetchTasksByProject(), 500);
+      },
+      (error) => {
+        this.showNotification(error.error?.error || "Failed to delete the Task.", "Retry");
+      }
+    );
   }
 
   navigateToProjects(): void {
@@ -175,9 +212,23 @@ export class TasksComponent implements OnInit {
   }
 
   openTaskDetailDialog(task: Task): void {
-    this.dialog.open(TaskDetailsComponent, {
+    const dialogRef = this.dialog.open(TaskDetailsComponent, {
         width: '1000px',
         data: { task }
     });
-}
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.fetchTasksByProject();
+    });
+  }
+
+  showNotification(message: string, action: string = "Close"): void {
+    this.snackBar.open(message, action, {
+      duration: 5000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      panelClass: ["custom-snackbar"]
+    });
+  }
+  
 }

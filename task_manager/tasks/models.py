@@ -19,7 +19,7 @@ class Project(models.Model):
 
 class Task(models.Model):
     PRIORITY_CHOICES = [('low', 'Low'), ('medium', 'Medium'), ('high', 'High')]
-    STATUS_CHOICES = [('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')]
+    STATUS_CHOICES = [('ToDo', 'ToDo'), ('InProgress', 'InProgress'), ('Completed', 'Completed'), ('Archive', 'Archive')]
 
     title = models.CharField(max_length=255)
     description = models.TextField()

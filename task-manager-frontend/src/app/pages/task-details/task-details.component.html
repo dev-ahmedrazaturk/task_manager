@@ -1,8 +1,7 @@
-<h2 mat-dialog-title>Task Details</h2>
+<h3 mat-dialog-title><b>Task Details</b></h3>
 <mat-dialog-content>
-    <!-- Task Details Section -->
     <div class="task-details">
-        <h3>{{ task.title }}</h3>
+        <h2>{{ task.title }}</h2>
         <p><strong>Description:</strong> {{ task.description }}</p>
         <p><strong>Due Date:</strong> {{ task.due_date | date }}</p>
         <p><strong>Priority:</strong> {{ task.priority }}</p>
@@ -18,7 +17,7 @@
         <div class="comment-list" #commentsContainer>
             <div class="comment" *ngFor="let comment of comments">
                 <div class="comment-header">
-                    <span class="comment-author">{{ comment.user.username }}</span>
+                    <span class="comment-author"><b>{{ comment.user.username }}</b></span>
                     <span class="comment-date">{{ comment.created_at | date }}</span>
                 </div>
                 <div class="comment-body">
@@ -35,15 +34,20 @@
             </div>
         </div>
 
-        <!-- Add New Comment Form -->
         <form [formGroup]="commentForm" (ngSubmit)="addComment()">
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Add a comment</mat-label>
-                <textarea matInput formControlName="text" rows="3"></textarea>
+            <mat-form-field appearance="outline" class="comment-box">
+                <mat-label>Add a comment*</mat-label>
+                <textarea matInput formControlName="text" rows="1"></textarea>
+                
+                <!-- Send Icon Inside the Input Field -->
+                <button mat-icon-button matSuffix type="submit" color="primary" class="send-button">
+                    <mat-icon>send</mat-icon>
+                </button>
             </mat-form-field>
-            <button mat-raised-button color="primary" type="submit">Add Comment</button>
         </form>
+        
     </div>
+
 </mat-dialog-content>
 
 <mat-dialog-actions>

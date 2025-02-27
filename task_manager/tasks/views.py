@@ -133,15 +133,23 @@ class ProjectViewSet(viewsets.ModelViewSet):
         instance.save()
 
         return super().partial_update(request, *args, **kwargs)
-
+   
     def destroy(self, request, *args, **kwargs):
         """
         - Only admins can delete projects.
+        - Prevent deletion if the project has associated tasks.
         """
         if not request.user.is_admin:
             return Response({"error": "Only admins can delete projects."}, status=status.HTTP_403_FORBIDDEN)
 
         instance = self.get_object()
+
+        if Task.objects.filter(project=instance).exists():
+            return Response(
+                {"error": "This project cannot be deleted because it has associated tasks."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         instance.delete()
         return Response({"message": "Project deleted successfully."}, status=status.HTTP_200_OK)
 
@@ -206,10 +214,18 @@ class TaskViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """
         - Ensure only an admin or project creator can delete a task.
+        - Prevent deletion if the task has associated comments.
         """
         instance = self.get_object()
+
         if not request.user.is_admin and request.user != instance.project.created_by:
             return Response({"error": "Only admins or the project creator can delete tasks."}, status=status.HTTP_403_FORBIDDEN)
+
+        if Comment.objects.filter(task=instance).exists():
+            return Response(
+                {"error": "This task cannot be deleted because it has associated comments. You can change its status to 'Archive' instead."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         self.perform_destroy(instance)
         return Response({"message": "Task deleted successfully."}, status=status.HTTP_200_OK)
@@ -258,6 +274,20 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @action(detail=False, methods=["GET"], url_path="count")
+    def get_comment_count(self, request):
+        """
+        - Returns the total number of comments for a given task.
+        - Requires `task_id` as a query parameter.
+        """
+        task_id = request.query_params.get("task_id")
+
+        if not task_id:
+            return Response({"error": "task_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        count = Comment.objects.filter(task_id=task_id).count()
+
+        return Response({"task_id": task_id, "comment_count": count}, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         """
@@ -276,7 +306,8 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response({"error": "Only the task assignee or an admin can comment."}, status=status.HTTP_403_FORBIDDEN)
 
         # Pass task.id instead of the entire task object
-        serializer.save(user=self.request.user, task_id=task.id)  # task_id is expected, not task object
+        serializer.save(user=self.request.user, task_id=task.id)
+        
     def update(self, request, *args, **kwargs):
         """
         - Only the comment owner or admin can update a comment.
@@ -286,7 +317,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response({"error": "You can only edit your own comments."}, status=status.HTTP_403_FORBIDDEN)
 
         return super().update(request, *args, **kwargs)
-
+    
     def partial_update(self, request, *args, **kwargs):
         """
         - Only the comment owner or admin can partially update a comment.

@@ -20,20 +20,22 @@
     padding: 10px;
     border-top: 1px solid #eee;
     max-height: 60vh;
-    overflow-y: auto; /* Ensure the comments section can scroll */
+    overflow-y: auto;
 }
 
 /* Comments List */
 .comment-list {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 /* Individual Comment Styling */
 .comment {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     padding: 10px;
     background: #f9f9f9;
-    border-radius: 4px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Comment Header (Username and Date) */
@@ -42,25 +44,31 @@
     justify-content: space-between;
     font-size: 0.9em;
     color: #666;
+    align-items: center;
     margin-bottom: 5px;
 }
 
 /* Comment Body */
 .comment-body {
     font-size: 0.9em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 /* Comment Actions (Edit/Delete) */
 .comment-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 5px;
+    margin-top: 5px;
 }
 
 .comment-actions button {
     background-color: transparent;
     border: none;
     color: #888;
+    padding: 5px;
 }
 
 .comment-actions button:hover {
@@ -68,65 +76,51 @@
 }
 
 /* Add New Comment Form */
-.full-width {
+.comment-box {
     width: 100%;
-}
-
-textarea {
-    width: 100%;
-    min-height: 50px;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-button.mat-raised-button {
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    background-color: #1976d2;
-    color: #fff;
-    border-radius: 6px;
-}
-
-/* Actions (Close Button) */
-mat-dialog-actions {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 5px;
 }
 
-.actions button {
-    background-color: #e0e0e0;
-    padding: 10px 20px;
+/* Textarea Inside Comment Box */
+.comment-box textarea {
+    flex-grow: 1;
+    min-height: 40px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
     border-radius: 6px;
     font-size: 1rem;
+    background-color: #fff;
     color: #333;
+    resize: vertical;
+    border: none;
+    outline: none;
 }
 
-.actions button:hover {
-    background-color: #ccc;
+/* Send Button Inside the Input Field */
+.send-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    border-radius: 50%;
+    background-color: #1976d2;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-/* Make the whole dialog scrollable and with a max-height */
-.mat-dialog-content {
-    max-height: 80vh;
-    overflow-y: auto;
+.send-button:hover {
+    background-color: #135ca1;
 }
 
-/* Override Angular Material Dialog Width */
-.mat-dialog-container {
-    width: 1000px !important;  /* Increase the width to 1000px */
-    max-width: 100% !important; /* Prevent it from exceeding screen size */
-}
-
-.mat-dialog-content {
-    display: block;
-    width: 100%;
-}
-
-/* Responsiveness */
+/* Responsive Fix */
 @media (max-width: 768px) {
     .task-details p {
         font-size: 0.9rem;
@@ -135,4 +129,10 @@ mat-dialog-actions {
     .comments-section {
         max-height: 50vh;
     }
+}
+
+/* Force Dialog Width */
+::ng-deep .cdk-overlay-pane.mat-mdc-dialog-panel {
+    max-width: var(--mat-dialog-container-max-width, 900px) !important;
+    min-width: var(--mat-dialog-container-min-width, 300px);
 }

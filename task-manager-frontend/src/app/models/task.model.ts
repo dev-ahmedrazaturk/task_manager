@@ -12,4 +12,5 @@ export interface Task {
   project: Project;
   assigned_to: User[];
   comments: Comment[] | null;
+  count: number
 }

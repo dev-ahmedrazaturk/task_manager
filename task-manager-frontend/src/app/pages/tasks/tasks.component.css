@@ -81,7 +81,6 @@
     flex: 1;
   }
   
-  /* Make Task Description Full Width */
   .full-width {
     width: 100%;
   }
@@ -101,6 +100,42 @@
       flex-direction: column;
     }
   }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
   
+  .page-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+  }
+  
+  .comment-btn {
+    position: relative;
+  }
+  
+  .comment-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(50%, -50%);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
   
   

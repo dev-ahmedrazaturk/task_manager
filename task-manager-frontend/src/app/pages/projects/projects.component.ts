@@ -17,7 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-projects',
@@ -25,6 +25,7 @@ import { Router } from '@angular/router';
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css'],
   imports: [
+    MatSnackBarModule,
     MatIconModule,
     CommonModule,
     ReactiveFormsModule,
@@ -63,7 +64,8 @@ export class ProjectsComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private dialog: MatDialog,
-    private router: Router 
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.projectForm = this.fb.group({
       name: ['', Validators.required],
@@ -120,14 +122,18 @@ export class ProjectsComponent implements OnInit {
     };
 
     if (this.editingProjectId) {
-      this.projectService.updateProject(this.editingProjectId, projectData).subscribe(() => {
-        this.fetchProjects();
-        this.closeProjectModal();
+      this.projectService.updateProject(this.editingProjectId, projectData).subscribe(
+        (response: any) => {
+          this.fetchProjects();
+          this.closeProjectModal();
+          this.showNotification(`Project "${response.name}" updated successfully!`);
       });
     } else {
-      this.projectService.createProject(projectData).subscribe(() => {
-        this.fetchProjects();
-        this.closeProjectModal();
+      this.projectService.createProject(projectData).subscribe(
+        (response: any) => {
+          this.fetchProjects();
+          this.closeProjectModal();
+          this.showNotification(`Project "${response.name}" created successfully!`);
       });
     }
   }
@@ -142,7 +148,16 @@ export class ProjectsComponent implements OnInit {
   }
 
   deleteProject(projectId: number): void {
-    this.projectService.deleteProject(projectId).subscribe(() => this.fetchProjects());
+    this.projectService.deleteProject(projectId).subscribe(
+      (response: any) => {
+        this.fetchProjects();
+        this.showNotification(response.message || "Project deleted successfully!");
+      },
+      (error) => {
+        const errorMessage = error.error?.error || "Failed to delete the project.";
+        this.showNotification(errorMessage, "Retry");
+      }
+    );
   }
 
   navigateToDashboard(): void {
@@ -151,6 +166,15 @@ export class ProjectsComponent implements OnInit {
 
   navigateToProjectTasks(projectId: number): void {
     this.router.navigate(['/tasks', projectId]);
+  }
+  
+  showNotification(message: string, action: string = "Close"): void {
+    this.snackBar.open(message, action, {
+      duration: 5000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      panelClass: ["custom-snackbar"]
+    });
   }
   
 }
