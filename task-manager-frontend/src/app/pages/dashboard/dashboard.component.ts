@@ -23,6 +23,14 @@ export class DashboardComponent {
     this.router.navigate(['/projects']);
   }
 
+  userProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  userManagement(): void {
+    this.router.navigate(['/users']);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

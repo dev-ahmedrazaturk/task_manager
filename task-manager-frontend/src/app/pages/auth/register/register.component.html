@@ -1,46 +1,61 @@
-<!-- src/app/pages/register/register.component.html -->
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <h2>Task Manager</h2>
+    <nav>
+      <ul>
+        <li><a routerLink="/dashboard">🏠 Home</a></li>
+        <li><a routerLink="/users">👥 Manage Users</a></li>
+      </ul>
+    </nav>
+  </aside>
 
-<div class="register-container">
-    <h2>Register</h2>
-    <form [formGroup]="registerForm" (ngSubmit)="register()">
-      <div>
-        <label for="username">Username</label>
-        <input
-          id="username"
-          formControlName="username"
-          type="text"
-          placeholder="Enter your username"
-        />
-      </div>
-      <div>
-        <label for="email">Email</label>
-        <input
-          id="email"
-          formControlName="email"
-          type="email"
-          placeholder="Enter your email"
-        />
-      </div>
-      <div>
-        <label for="password">Password</label>
-        <input
-          id="password"
-          formControlName="password"
-          type="password"
-          placeholder="Enter your password"
-        />
-      </div>
-      <div>
-        <label for="is_admin">Admin</label>
-        <input
-          id="is_admin"
-          formControlName="is_admin"
-          type="checkbox"
-        />
-      </div>
-      <button type="submit" [disabled]="registerForm.invalid">Register</button>
-      <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-    </form>
-    <p>Already have an account? <a routerLink="/login">Login here</a></p>
-  </div>
-  
+  <main class="content">
+    <div class="form-container">
+      <h2>Add New User</h2>
+      <form [formGroup]="addUserForm" (ngSubmit)="addUser()">
+        
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            formControlName="username"
+            type="text"
+            placeholder="Enter username"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            placeholder="Enter user email"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            formControlName="password"
+            type="password"
+            placeholder="Enter password"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <input id="is_admin" formControlName="is_admin" type="checkbox" />
+          <label for="is_admin">Grant Admin Access</label>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" [disabled]="addUserForm.invalid">Add User</button>
+          <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+        </div>
+
+        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+      </form>
+    </div>
+  </main>
+</div>

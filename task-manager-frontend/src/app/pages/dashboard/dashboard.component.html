@@ -1,18 +1,17 @@
 <div class="dashboard-container">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <h2>Task Manager</h2>
       <nav>
         <ul>
-          <li><a routerLink="/dashboard">📋 Tasks</a></li>
+          <li><a routerLink="/dashboard">📋 My Tasks</a></li>
           <li><a (click)="projects()">📂 Projects</a></li>
-          <li><a routerLink="/profile">👤 Profile</a></li>
+          <li><a (click)="userProfile()">👤 Profile</a></li>
+          <li><a (click)="userManagement()">👤 Users</a></li>
           <li><a (click)="logout()">🚪 Logout</a></li>
         </ul>
       </nav>
     </aside>
   
-    <!-- Main Content -->
     <main class="content">
       <h1>Welcome, {{ user?.username }} ( {{ user?.is_admin ? "ADMIN" : "USER" }})</h1>
   

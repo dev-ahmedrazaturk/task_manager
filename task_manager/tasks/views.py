@@ -9,7 +9,72 @@ from .serializers import CommentSerializer, CustomTokenObtainPairSerializer, Tas
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import action
+from django.contrib.auth.hashers import make_password
 
+class UserManagementViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet to handle adding, updating, and deactivating users.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        """
+        Fetch active users by default.
+        If 'all=true' is passed in the query params, return all users.
+        """
+        all_users = self.request.query_params.get('all', 'false').lower() == 'true'
+        if all_users:
+            return User.objects.all()  # Return both active and inactive users
+        return User.objects.filter(is_active=True)  # Return only active users
+
+    def create(self, request, *args, **kwargs):
+        """
+        Add a new user with a hashed password.
+        """
+        data = request.data.copy()
+        if 'password' in data:
+            data['password'] = make_password(data['password'])  # ✅ Hash password before saving
+        
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        """
+        Update user details (Admin only).
+        Supports both full update (PUT) and partial update (PATCH).
+        """
+        try:
+            user = User.objects.get(pk=pk)
+            partial = kwargs.get('partial', False)  # Ensure partial update handling
+            
+            data = request.data.copy()
+            if 'password' in data:
+                data['password'] = make_password(data['password'])  # ✅ Hash password if provided
+            
+            serializer = UserSerializer(user, data=data, partial=partial)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, pk=None):
+        """
+        Deactivate (soft delete) a user instead of deleting.
+        """
+        try:
+            user = User.objects.get(pk=pk)
+            user.is_active = False
+            user.save()
+            return Response({'message': 'User deactivated successfully'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class UserViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]

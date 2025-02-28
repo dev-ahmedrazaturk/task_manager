@@ -11,7 +11,24 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getAllUsers(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getAllUsers(activeOnly: boolean = true): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}?all=${!activeOnly}`);
+  }
+  
+
+  addUser(user: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, user);
+  }
+
+  updateUser(id: number, user: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}${id}/`, user);
+  }
+
+  deactivateUser(id: number): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}${id}/`, { is_active: false });
+  }
+
+  activateUser(id: number): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}${id}/`, { is_active: true });
   }
 }

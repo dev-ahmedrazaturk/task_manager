@@ -1,0 +1,113 @@
+<div class="user-management-container">
+    <div class="header-bar">
+      <button mat-icon-button color="primary" (click)="navigateToDashboard()">
+        <mat-icon>home</mat-icon>
+      </button>
+      <span class="header-title">User Management</span>
+      <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="openUserModal()">
+        <mat-icon>add</mat-icon> Add User
+      </button>
+    </div>
+  
+    <div class="filter-bar">
+      <mat-form-field class="search-bar full-width" appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search Users" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+      </mat-form-field>
+  
+      <button mat-button (click)="toggleActiveInactiveUsers()" color="accent">
+        <mat-icon>{{ showActiveUsers ? 'visibility_off' : 'visibility' }}</mat-icon>
+        {{ showActiveUsers ? 'Show Inactive Users' : 'Show Active Users' }}
+      </button>
+    </div>
+  
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 animated-table">
+      <!-- Username Column -->
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef> Username </th>
+        <td mat-cell *matCellDef="let user">
+          <mat-icon>person</mat-icon> {{ user.username }}
+        </td>
+      </ng-container>
+  
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef> Email </th>
+        <td mat-cell *matCellDef="let user">
+          <mat-icon>email</mat-icon> {{ user.email }}
+        </td>
+      </ng-container>
+  
+      <!-- Role Column -->
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef> Role </th>
+        <td mat-cell *matCellDef="let user">
+          <mat-chip [ngClass]="{'admin-chip': user.is_admin, 'user-chip': !user.is_admin}">
+            {{ user.is_admin ? 'Admin' : 'User' }}
+          </mat-chip>
+        </td>
+      </ng-container>
+  
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let user">
+          <span [ngClass]="{'active-status': user.is_active, 'inactive-status': !user.is_active}">
+            {{ user.is_active ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+      </ng-container>
+  
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let user">
+          <button *ngIf="isAdmin" mat-icon-button color="accent" (click)="openUserModal(user)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button *ngIf="isAdmin" mat-icon-button color="warn" (click)="toggleUserStatus(user)">
+            <mat-icon>{{ user.is_active ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  
+    <!-- Paginator -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  
+    <!-- User Modal -->
+    <ng-template #userDialog let-dialogRef>
+      <div class="modal-container">
+        <h2>{{ editingUserId ? 'Edit User' : 'Add User' }}</h2>
+        <form [formGroup]="userForm" (ngSubmit)="createOrUpdateUser()">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Username</mat-label>
+            <input matInput placeholder="Username" formControlName="username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" placeholder="Password" formControlName="password" />
+          </mat-form-field>
+  
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="Email" formControlName="email" />
+          </mat-form-field>
+  
+          <mat-checkbox formControlName="is_admin">Admin</mat-checkbox>
+  
+          <div class="actions">
+            <button mat-raised-button color="primary" type="submit">
+              {{ editingUserId ? 'Update' : 'Create' }}
+            </button>
+            <button mat-button (click)="closeUserModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </div>
+  

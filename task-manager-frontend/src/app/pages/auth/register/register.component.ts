@@ -5,15 +5,15 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,  // ✅ Ensure it's a standalone component
+  selector: 'app-add-user',
+  standalone: true,  
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [CommonModule, ReactiveFormsModule]  // ✅ Keep only ONE `imports` property
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class RegisterComponent {
 
-  registerForm: FormGroup;
+  addUserForm: FormGroup;
   errorMessage: string = "";
 
   constructor(
@@ -21,7 +21,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    this.registerForm = this.fb.group({
+    this.addUserForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -29,17 +29,22 @@ export class RegisterComponent {
     });
   }
 
-  register(): void {
-    if (this.registerForm.invalid) return;
+  addUser(): void {
+    if (this.addUserForm.invalid) return;
 
-    const userData = this.registerForm.value;
+    const userData = this.addUserForm.value;
     this.authService.register(userData).subscribe(
       (response) => {
-        this.router.navigate(['/login']);
+        alert('User added successfully!');
+        this.router.navigate(['/users']);
       },
       (error) => {
-        this.errorMessage = 'Registration failed. Please try again.';
+        this.errorMessage = 'User creation failed. Please try again.';
       }
     );
+  }
+
+  cancel(): void {
+    this.router.navigate(['/dashboard']);
   }
 }
