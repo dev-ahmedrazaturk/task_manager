@@ -34,8 +34,9 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         Add a new user with a hashed password.
         """
         data = request.data.copy()
-        if 'password' in data:
-            data['password'] = make_password(data['password'])  # ✅ Hash password before saving
+        
+        # Ensure the user is created as active
+        data['is_active'] = True
         
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
@@ -51,12 +52,8 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         try:
             user = User.objects.get(pk=pk)
             partial = kwargs.get('partial', False)  # Ensure partial update handling
-            
-            data = request.data.copy()
-            if 'password' in data:
-                data['password'] = make_password(data['password'])  # ✅ Hash password if provided
-            
-            serializer = UserSerializer(user, data=data, partial=partial)
+
+            serializer = UserSerializer(user, data=request.data, partial=partial)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)

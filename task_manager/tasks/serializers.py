@@ -4,19 +4,20 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password', 'is_admin', 'is_active']
-        extra_kwargs = {'password': {'write_only': True}}  # Ensure password is not exposed in API responses
 
     def create(self, validated_data):
-        """
-        Create a new user and hash the password.
-        """
-        password = validated_data.pop('password', None)
-        user = User(**validated_data)
-        if password:
-            user.set_password(password)  # ✅ Hash password
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            is_admin=validated_data.get('is_admin', False),
+            is_active=validated_data.get('is_active', True),  # Ensure user is active by default
+        )
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
@@ -24,12 +25,11 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Update user details and hash password if provided.
         """
-        password = validated_data.pop('password', None)
         for attr, value in validated_data.items():
-            setattr(instance, attr, value)  # Update other fields
-
-        if password:  # ✅ Ensure password is hashed when updating
-            instance.set_password(password)
+            if attr == 'password':
+                instance.set_password(value)  # Hash password if provided
+            else:
+                setattr(instance, attr, value)
 
         instance.save()
         return instance
