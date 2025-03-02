@@ -9,11 +9,9 @@
         <p><strong>Assigned To:</strong> {{ getAssignedUsernames(task) }}</p>
     </div>
 
-    <!-- Comments Section -->
     <div class="comments-section">
         <h4>Comments</h4>
 
-        <!-- Display Existing Comments -->
         <div class="comment-list" #commentsContainer>
             <div class="comment" *ngFor="let comment of comments">
                 <div class="comment-header">
@@ -39,7 +37,6 @@
                 <mat-label>Add a comment*</mat-label>
                 <textarea matInput formControlName="text" rows="1"></textarea>
                 
-                <!-- Send Icon Inside the Input Field -->
                 <button mat-icon-button matSuffix type="submit" color="primary" class="send-button">
                     <mat-icon>send</mat-icon>
                 </button>

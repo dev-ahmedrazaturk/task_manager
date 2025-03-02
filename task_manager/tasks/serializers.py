@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             is_admin=validated_data.get('is_admin', False),
-            is_active=validated_data.get('is_active', True),  # Ensure user is active by default
+            is_active=validated_data.get('is_active', True),
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
         for attr, value in validated_data.items():
             if attr == 'password':
-                instance.set_password(value)  # Hash password if provided
+                instance.set_password(value)
             else:
                 setattr(instance, attr, value)
 
@@ -39,7 +39,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        # Add custom claims (user details) to the token
         token['username'] = user.username
         token['email'] = user.email
         token['is_admin'] = user.is_admin
@@ -69,7 +68,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = '__all__'
-        read_only_fields = ["created_by"]  # Make sure this field is read-only
+        read_only_fields = ["created_by"]
 
 class TaskSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(many=True, read_only=True)

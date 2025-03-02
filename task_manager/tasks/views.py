@@ -26,8 +26,8 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         """
         all_users = self.request.query_params.get('all', 'false').lower() == 'true'
         if all_users:
-            return User.objects.all()  # Return both active and inactive users
-        return User.objects.filter(is_active=True)  # Return only active users
+            return User.objects.all()
+        return User.objects.filter(is_active=True)
 
     def create(self, request, *args, **kwargs):
         """
@@ -35,7 +35,6 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         """
         data = request.data.copy()
         
-        # Ensure the user is created as active
         data['is_active'] = True
         
         serializer = UserSerializer(data=data)
@@ -51,7 +50,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         """
         try:
             user = User.objects.get(pk=pk)
-            partial = kwargs.get('partial', False)  # Ensure partial update handling
+            partial = kwargs.get('partial', False)
 
             serializer = UserSerializer(user, data=request.data, partial=partial)
             if serializer.is_valid():
@@ -94,16 +93,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
 class UserProfileView(APIView):
-    authentication_classes = [JWTAuthentication]  # Ensure JWT Authentication is used
-    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
         Get the details of the currently authenticated user.
         """
-        # Serialize the user object using the UserSerializer
         serializer = UserSerializer(request.user)
-        return Response(serializer.data)  # Return the serialized data in the response
+        return Response(serializer.data)
     
 class LogoutView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -114,7 +112,6 @@ class LogoutView(generics.GenericAPIView):
             if not refresh_token:
                 return Response({"error": "Refresh token is required."}, status=400)
 
-            # Blacklist the refresh token
             token = RefreshToken(refresh_token)
             token.blacklist()
 
@@ -154,7 +151,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             description=data.get('description'),
             created_by=request.user
         )
-        project.assigned_users.set(assigned_user_ids)  # Assign users to project
+        project.assigned_users.set(assigned_user_ids)
         project.save()
 
         serializer = self.get_serializer(project)
@@ -235,18 +232,16 @@ class TaskViewSet(viewsets.ModelViewSet):
         - Ensure project ID is included.
         - Assign multiple users to the task.
         """
-        project_id = self.request.data.get("project")  # Get project ID from request
-        assigned_users = self.request.data.get("assigned_to", [])  # Get assigned users list
+        project_id = self.request.data.get("project")
+        assigned_users = self.request.data.get("assigned_to", [])
 
         if not project_id:
             return Response({"error": "Project ID is required to create a task."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Save task with project
-        task = serializer.save(project_id=project_id)  # Assign project ID explicitly
+        task = serializer.save(project_id=project_id)
 
-        # Assign ManyToMany Users
         if assigned_users:
-            task.assigned_to.set(assigned_users)  # Use `.set()` to update ManyToMany field
+            task.assigned_to.set(assigned_users)
 
     def update(self, request, *args, **kwargs):
         """
@@ -255,21 +250,17 @@ class TaskViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()
 
-        # Check permissions
         if not request.user.is_admin and request.user not in instance.project.assigned_users.all():
             return Response({"error": "Only admins or project managers can update tasks."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Deserialize incoming data
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        # Save the task instance (excluding assigned users initially)
         updated_task = serializer.save()
 
-        # Handle ManyToMany assigned users separately
         if "assigned_to" in request.data:
-            assigned_users = request.data.get("assigned_to", [])  # Get assigned users from request
-            updated_task.assigned_to.set(assigned_users)  # Update ManyToMany field
+            assigned_users = request.data.get("assigned_to", [])
+            updated_task.assigned_to.set(assigned_users)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -303,15 +294,14 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not project_id:
             return Response({"error": "Project ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = request.user  # Get current user
+        user = request.user
 
-        # Filter tasks based on user role
         if user.is_admin:
             tasks = Task.objects.filter(project_id=project_id)
         else:
             tasks = Task.objects.filter(project_id=project_id, assigned_to=user)
 
-        tasks = tasks.select_related('project').prefetch_related('assigned_to')  # Optimize query
+        tasks = tasks.select_related('project').prefetch_related('assigned_to')
 
         serializer = self.get_serializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -329,10 +319,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = Comment.objects.select_related('task', 'user')
 
-        # If a `task` query param is provided, filter comments for that task
         task_id = self.request.query_params.get("task")
         if task_id:
-            queryset = queryset.filter(task_id=task_id)  # Filter by task_id to get comments for specific task
+            queryset = queryset.filter(task_id=task_id)
 
         return queryset
 
@@ -356,18 +345,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         - Assigns the logged-in user to the comment.
         - Ensures only task assignees or admins can comment.
         """
-        task_id = self.request.data.get("task_id")  # Make sure to pass 'task_id' instead of 'task'
+        task_id = self.request.data.get("task_id")
 
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
             return Response({"error": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Correctly check Many-to-Many relationship (task.assigned_to is ManyToManyField)
         if not (self.request.user.is_admin or task.assigned_to.filter(id=self.request.user.id).exists()):
             return Response({"error": "Only the task assignee or an admin can comment."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Pass task.id instead of the entire task object
         serializer.save(user=self.request.user, task_id=task.id)
         
     def update(self, request, *args, **kwargs):

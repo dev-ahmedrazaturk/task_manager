@@ -1,38 +1,36 @@
 <div class="dashboard-container">
-    <aside class="sidebar">
-      <h2>Task Manager</h2>
-      <nav>
-        <ul>
-          <li><a routerLink="/dashboard">📋 My Tasks</a></li>
-          <li><a (click)="projects()">📂 Projects</a></li>
-          <li><a (click)="userManagement()">👤 Users Management</a></li>
-          <li><a (click)="logout()">🚪 Logout</a></li>
-        </ul>
-      </nav>
-    </aside>
-  
-    <main class="content">
+  <main class="content">
+    <div class="header">
       <h1>Welcome, {{ user?.username }} ( {{ user?.is_admin ? "ADMIN" : "USER" }})</h1>
-  
-      <div class="task-section">
-        <h2>Your Tasks</h2>
-        <ul>
-          <li *ngFor="let task of user?.tasks">
-            <span [class]="task.status">{{ task.title }}</span>
-            <span class="priority">{{ task.priority }}</span>
-          </li>
-        </ul>
+      <button class="logout-button" (click)="logout()">Logout</button>
+    </div>
+
+    <div class="intro">
+      <h2>Task Management System</h2>
+      <p>Our task management system helps you organize, track, and prioritize your tasks and projects efficiently. Whether you're working on personal tasks or managing large-scale projects, our system is designed to make your work easier and more productive.</p>
+    </div>
+
+    <div class="dashboard-blocks">
+      <!-- <div class="block">
+        <h2>My Tasks</h2>
+        <p>Keep track of your tasks, their statuses, and priorities. Stay on top of deadlines and manage them effectively.</p>
+      </div> -->
+
+      <div class="block" (click)="projects()">
+        <h2>Projects</h2>
+        <p>Manage your projects and track their progress. Collaborate with team members and achieve project goals on time.</p>
       </div>
-  
-      <div class="project-section">
-        <h2>Your Projects</h2>
-        <ul>
-          <li *ngFor="let project of user?.projects">
-            <span>{{ project.name }}</span>
-            <span class="created-by">Created by: {{ project.created_by }}</span>
-          </li>
-        </ul>
+
+      <div *ngIf="user?.is_admin" class="block" (click)="userManagement()">
+        <h2>Users Management</h2>
+        <p>Manage user roles and permissions within the system. Control who has access to specific tasks and projects.</p>
       </div>
-    </main>
-  </div>
-  
+
+      <div *ngIf="user?.is_admin" class="block">
+        <h2>Other Modules</h2>
+        <p>Additional modules can be developed as needed to meet specific requirements.</p>
+      </div>
+      
+    </div>
+  </main>
+</div>

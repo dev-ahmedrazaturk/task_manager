@@ -1,16 +1,16 @@
 <div class="tasks-container">
     <div class="header-actions">
         <div class="left-actions">
-          <button mat-icon-button class="home-btn" (click)="navigateToDashboard()" matTooltip="Go to Dashboard">
+          <button mat-icon-button class="navigate-button" (click)="navigateToDashboard()" matTooltip="Go to Dashboard">
             <mat-icon>home</mat-icon>
-          </button>
+          </button> &nbsp;
       
-          <button mat-icon-button class="home-btn" (click)="navigateToProjects()" matTooltip="Go to Projects">
+          <button mat-icon-button class="navigate-button" (click)="navigateToProjects()" matTooltip="Go to Projects">
             <mat-icon>folder</mat-icon>
           </button>
         </div>
       
-        <h2 class="page-title">Tasks for ({{ projectName || 'Project' }})</h2>
+        <span class="page-title">Tasks for ({{ projectName || 'Project' }})</span>
 
         <button *ngIf="isAdmin" mat-raised-button color="primary" class="create-task-btn" (click)="openTaskModal()">
           <mat-icon>add</mat-icon> Create Task
@@ -22,7 +22,6 @@
       <input matInput placeholder="Search tasks" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
     </mat-form-field>
   
-    <!-- Task List -->
     <div class="task-list">
       <div class="task-card" *ngFor="let task of dataSource.filteredData">
         <div class="task-header">
@@ -73,7 +72,6 @@
   
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   
-    <!-- Task Modal -->
     <ng-template #taskDialog let-dialogRef>
         <div class="modal-container">
           <h2 class="dialog-title">{{ editingTaskId ? 'Edit Task' : 'Create Task' }}</h2>

@@ -32,12 +32,12 @@ export class TaskDetailsComponent implements OnInit {
   comments: Comment[] = [];
   commentForm: FormGroup;
   editingCommentId: number | null = null;
-  currentUser: any; // Store the current logged-in user
+  currentUser: any;
 
   constructor(
     private fb: FormBuilder,
     private commentService: CommentService,
-    private authService: AuthService, // Inject UserService to fetch logged-in user info
+    private authService: AuthService,
     public dialogRef: MatDialogRef<TaskDetailsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { task: Task }
   ) {
@@ -59,7 +59,6 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   fetchCurrentUser(): void {
-    // Fetch the current user from UserService
     this.authService.getProfile().subscribe(user => {
       this.currentUser = user;
     });
@@ -88,7 +87,6 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   editComment(comment: Comment): void {
-    // Only allow editing if the current user is the creator of the comment
     if (comment.user.id === this.currentUser.id) {
       this.editingCommentId = comment.id;
       this.commentForm.patchValue({
@@ -98,7 +96,6 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   deleteComment(commentId: number): void {
-    // Only allow deletion if the current user is the creator of the comment
     const comment = this.comments.find(c => c.id === commentId);
     if (comment && comment.user.id === this.currentUser.id) {
       this.commentService.deleteComment(commentId).subscribe(() => {

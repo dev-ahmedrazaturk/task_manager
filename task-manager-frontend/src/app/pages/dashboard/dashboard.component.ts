@@ -16,15 +16,10 @@ export class DashboardComponent {
 
   constructor(private authService: AuthService, private router: Router) {
     this.user = this.authService.getCurrentUser();
-    debugger;
   }
 
   projects(): void {
     this.router.navigate(['/projects']);
-  }
-
-  userProfile(): void {
-    this.router.navigate(['/profile']);
   }
 
   userManagement(): void {

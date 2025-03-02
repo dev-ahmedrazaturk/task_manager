@@ -96,14 +96,12 @@ export class TasksComponent implements OnInit {
   fetchTasksByProject(): void {
     if (this.projectId) {
       this.taskService.getTasksByProject(this.projectId).subscribe((tasks: Task[]) => {
-        // Use a forkJoin to wait for all comment count API calls
         const taskRequests = tasks.map(task =>
           this.commentService.getCommentCount(task.id).pipe(
-            map(count => ({ ...task, count: count.comment_count })) // Attach count to each task
+            map(count => ({ ...task, count: count.comment_count }))
           )
         );
   
-        // Wait for all API calls before updating the tasks list
         forkJoin(taskRequests).subscribe(updatedTasks => {
           this.tasks = updatedTasks.map(task => ({
             ...task,

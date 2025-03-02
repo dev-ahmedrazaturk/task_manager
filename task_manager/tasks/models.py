@@ -28,7 +28,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     project = models.ForeignKey("Project", on_delete=models.CASCADE, related_name="tasks")
-    assigned_to = models.ManyToManyField(User, related_name="tasks_assigned")  # Changed to ManyToManyField
+    assigned_to = models.ManyToManyField(User, related_name="tasks_assigned")
 
     def __str__(self):
         return self.title
