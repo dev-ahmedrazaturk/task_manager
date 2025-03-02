@@ -24,13 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ni%mui!=73nd0$fr@c(5#w-w=+=^v!aros$=(^tswx571yb%cz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,16 +55,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-
-
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:4200",  # ✅ Correct format
-#     "http://127.0.0.1:4200"   # ✅ Ensure your frontend URL is listed
-# ]
-
-
-CORS_ALLOW_ALL_ORIGINS = True  # ✅ Allows all origins (Use for development only)
-
+CORS_ALLOW_ALL_ORIGINS = True  
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -88,7 +78,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Ensure all endpoints require authentication
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 

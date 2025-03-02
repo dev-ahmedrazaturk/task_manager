@@ -1,0 +1,5 @@
+services:
+  - type: static
+    name: task-manager-frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist/frontend
