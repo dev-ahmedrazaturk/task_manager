@@ -1,7 +1,8 @@
 services:
   - type: web
-    name: django-backend
+    name: task-manager-backend
     runtime: python
+    rootDirectory: task_manager
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn task_manager.wsgi
     envVars:
@@ -9,3 +10,5 @@ services:
         value: False
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        value: your-database-url
