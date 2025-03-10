@@ -1,0 +1,75 @@
+<div class="tasks-container">
+    <!-- Header and Actions -->
+    <div class="header-actions">
+      <div class="left-actions">
+        <button mat-icon-button class="navigate-button" (click)="navigateToDashboard()" matTooltip="Go to Dashboard">
+          <mat-icon>home</mat-icon>
+        </button> &nbsp;
+      </div>
+      <span class="page-title">My Tasks</span>
+    </div>
+  
+    <!-- Search Bar -->
+    <mat-form-field class="search-bar" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Search tasks" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)">
+    </mat-form-field>
+  
+    <!-- Task List -->
+    <div class="task-list">
+      <div class="task-card" *ngFor="let task of dataSource.filteredData">
+        <div class="task-header">
+          <mat-icon>checklist</mat-icon>
+          <span class="task-title">{{ task.title }}</span>
+        </div>
+        <div class="task-body">
+          <!-- Task Description -->
+          <div class="task-detail">
+            <span>{{ task.description }}</span>
+          </div>
+  
+          <!-- Due Date -->
+          <div class="task-detail">
+            <mat-icon>event</mat-icon>
+            <span>{{ task.due_date }}</span>
+          </div>
+  
+          <!-- Priority -->
+          <div class="task-detail">
+            <mat-icon>priority_high</mat-icon>
+            <span>{{ task.priority }}</span>
+          </div>
+  
+          <!-- Status -->
+          <div class="task-detail">
+            <mat-icon>flag</mat-icon>
+            <span>{{ task.status }}</span>
+          </div>
+  
+          <!-- Assigned Users -->
+          <div class="task-detail">
+            <mat-icon>group</mat-icon>
+            <span>{{ getAssignedUsernames(task) }}</span>
+          </div>
+  
+          <!-- Project -->
+          <div class="task-detail">
+            <mat-icon>folder</mat-icon>
+            <span>{{ task.project.name }}</span>
+          </div>
+        </div>
+  
+        <!-- Task Actions -->
+        <div class="task-actions">
+          <!-- Comment Button -->
+          <button mat-icon-button color="primary" (click)="openTaskDetailDialog(task)" class="comment-btn">
+            <mat-icon>comment</mat-icon>
+            <span class="comment-badge" *ngIf="task.count > 0">{{ task.count }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Paginator -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>

@@ -9,7 +9,8 @@ from .serializers import CommentSerializer, CustomTokenObtainPairSerializer, Tas
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import action
-from django.contrib.auth.hashers import make_password
+from rest_framework import status
+
 
 class UserManagementViewSet(viewsets.ModelViewSet):
     """
@@ -119,7 +120,6 @@ class LogoutView(generics.GenericAPIView):
 
         except Exception:
             return Response({"error": "Invalid token."}, status=400)
-
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -305,6 +305,43 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='by-user')
+    def get_tasks_by_user(self, request):
+        """
+        Get tasks based on the logged-in user with optional filters.
+        - Admins: Can view all tasks.
+        - Regular users: Can only view their own tasks.
+        - Filters: Status, Due Date, and User ID.
+        """
+        user = request.user
+
+        if user.is_admin:
+            tasks = Task.objects.all()
+        else:
+            tasks = Task.objects.filter(assigned_to=user)
+
+        # Apply optional filters
+        status_filter = request.query_params.get('status')
+        due_date = request.query_params.get('due_date')
+        user_id = request.query_params.get('user_id')
+
+        if status_filter:
+            tasks = tasks.filter(status=status_filter)
+        if due_date:
+            tasks = tasks.filter(due_date=due_date)
+        if user_id:
+            try:
+                tasks = tasks.filter(user_id=int(user_id.strip('/')))
+            except ValueError:
+                return Response({"error": "Invalid user ID format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Optimize query performance
+        tasks = tasks.select_related('project').prefetch_related('assigned_to')
+
+        serializer = self.get_serializer(tasks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer

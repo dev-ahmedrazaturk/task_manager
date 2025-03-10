@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Task } from '../models/task.model';
 import { environment } from '../../environments/environment';
@@ -18,6 +18,22 @@ export class TaskService {
 
   getTasksByProject(projectId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}by-project/?project_id=${projectId}`);
+  }
+
+  getTasksByUserOrAll(filters: { status?: string; due_date?: string; user_id?: string }): Observable<any> {
+    let params = new HttpParams();
+    
+    if (filters.status) {
+      params = params.set('status', filters.status);
+    }
+    if (filters.due_date) {
+      params = params.set('due_date', filters.due_date);
+    }
+    if (filters.user_id) {
+      params = params.set('user_id', filters.user_id);
+    }
+
+    return this.http.get<any>(this.apiUrl, { params });
   }
 
   createTask(taskData: any): Observable<Task> {

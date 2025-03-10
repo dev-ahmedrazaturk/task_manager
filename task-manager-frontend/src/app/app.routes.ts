@@ -6,6 +6,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { ProjectsComponent } from './pages/projects/projects.component';
 import { TasksComponent } from './pages/tasks/tasks.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { MyTasksComponent } from './pages/tasks/my-tasks/my-tasks.component';
 
 export const routes: Routes = [
 
@@ -15,6 +16,6 @@ export const routes: Routes = [
   { path: 'users', component: UserManagementComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'projects', component: ProjectsComponent, canActivate: [AuthGuard] },
+  { path: 'tasks', component: MyTasksComponent, canActivate: [AuthGuard] },
   { path: 'tasks/:projectId', component: TasksComponent, canActivate: [AuthGuard] }
-
 ];

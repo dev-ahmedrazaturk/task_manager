@@ -18,6 +18,10 @@ export class DashboardComponent {
     this.user = this.authService.getCurrentUser();
   }
 
+  myTasks(): void {
+    this.router.navigate(['/tasks']);
+  }
+
   projects(): void {
     this.router.navigate(['/projects']);
   }
