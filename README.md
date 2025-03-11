@@ -58,13 +58,13 @@ npm install
 ng serve --open
 
 
-Here is the list of the users admin and simple users
+## **Here is the list of the users admin and simple users**
 
-1. Admin User 
+### **Admin User**  
 Username -- john
 password -- 123456
 
-2. Simple Users
+### **Simple Users**
 
 Username -- ahmed
 password -- 123456
