@@ -1,19 +1,20 @@
 # Task Management System (TMS)
 
-A **Task Management System** built using **Django & Django REST Framework (DRF)**.  
-This system allows **admins and regular users** to manage **projects, tasks, and comments**.
+A **Task Management System** built using **Django & Django REST Framework (DRF)** and **Angular Js**  
+This system allows **admins and regular users** to manage **projects, tasks, comments and users**.
 
 ## Features
 - **User Authentication**: Supports JWT-based authentication.
 - **User Roles**:
   - **Admin**: Can create, update, and delete projects and tasks.
-  - **Regular Users**: Can view & work on assigned tasks and comment on them.
+  - **Regular Users**: Can view/add & work on assigned tasks and comment on them.
 - **Projects Management**: Admins can create projects and assign users.
 - **Tasks Management**: Tasks can be assigned to multiple users.
 - **Commenting System**: Task assignees and admins can comment on tasks.
 
 ## **Tech Stack**
 - **Backend**: Django, Django REST Framework (DRF)
+- **Frontend**: Angular Js
 - **Authentication**: JWT (JSON Web Token)
 - **Database**: SQLite (default), PostgreSQL/MySQL (optional)
 - **Dependencies**: `djangorestframework`, `djangorestframework-simplejwt`
@@ -22,8 +23,10 @@ This system allows **admins and regular users** to manage **projects, tasks, and
 
 ### ** Clone the Repository**
 https://github.com/dev-ahmedrazaturk/task_manager.git
-cd TASK_MANAGER
 
+### **For Backend Django Setup**
+
+cd task_manager
 
 ## Create & Activate Virtual Environment
 
@@ -46,5 +49,10 @@ python manage.py migrate
 
 python manage.py runserver
 
+### **For Frontend Setup**
 
-Access the API at: http://127.0.0.1:8000/api/
+cd task-manager-frontend
+
+npm install
+
+ng serve --open
