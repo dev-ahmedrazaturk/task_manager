@@ -56,3 +56,18 @@ cd task-manager-frontend
 npm install
 
 ng serve --open
+
+
+Here is the list of the users admin and simple users
+
+1. Admin User 
+Username -- john
+password -- 123456
+
+2. Simple Users
+
+Username -- ahmed
+password -- 123456
+
+Username -- ali
+password -- 123456
